@@ -121,7 +121,7 @@ h1 {
   bottom: 12px;
   z-index: 5;
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(260px, 2fr) auto;
+  grid-template-columns: minmax(180px, 1fr) minmax(260px, 2fr) auto auto;
   align-items: center;
   gap: 16px;
   box-shadow: 0 10px 30px rgb(0 0 0 / 14%);

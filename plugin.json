@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/songloft-org/plugin-toolchain/main/schemas/plugin.schema.json",
   "name": "GDStudio 音乐",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "搜索 GDStudio 音乐，试听满意后手动加入 Songloft 曲库",
   "author": "jwxa",
   "homepage": "https://github.com/jwxa/songloft-plugin-gdstudio",

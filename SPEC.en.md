@@ -123,7 +123,7 @@ After previewing, the user can explicitly add one or multiple tracks to the libr
 - Download bridge tests verify task-owner isolation, FIFO ordering, the global concurrency limit, real byte progress, and completion/failure states.
 - Plugin page queue tests verify that the third item waits when concurrency is two and lock down the race where a host `queued` snapshot could otherwise resubmit the same item.
 - Settings persistence tests verify enabled-source, path-template, and one-to-three concurrency save/restore behavior and reject invalid values.
-- Responsive UI checks cover web, narrow mobile viewports, and desktop WebView behavior, focusing on user-gesture playback, mini-player state, and reachable actions.
+- Responsive UI checks cover web, narrow mobile viewports, and desktop WebView behavior. Android/iOS WebViews require a second explicit “Play preview” gesture after resolution, while blocked desktop autoplay falls back to the same button; checks also cover mini-player state and reachable actions.
 - Acceptance validation covers at least Web, Android WebView, and Windows WebView. Other platforms share the same web UI but are not claimed as fully platform-tested.
 - Backend completion requires formatting, static checks, focused tests, the complete Go test suite, and Swagger regeneration validation.
 - Plugin completion requires TypeScript type checking, plugin build, manifest validation, and contract tests.

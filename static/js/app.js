@@ -78,6 +78,7 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
       })
     })
 
+    element('#preview-play').addEventListener('click', () => void playPreview())
     element('#preview-stop').addEventListener('click', () => stopPreview(true))
     element('#batch-add').addEventListener('click', () => void addSelected())
     element('#batch-download').addEventListener('click', () => queueDownloads(findSelectedTracks(state.selected)))
@@ -509,8 +510,12 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
       element('#preview-meta').textContent = formatAudioQuality(session.audio)
       player.hidden = false
       audio.src = session.stream_url
-      await audio.play()
-      setStatus(`正在试听《${track.title}》`)
+      audio.load()
+      if (requiresExplicitPreviewGesture()) {
+        showPreviewPlayPrompt(track)
+      } else {
+        await playPreview(true)
+      }
     } catch (error) {
       await releasePreviewSession()
       element('#preview-player').hidden = true
@@ -523,12 +528,48 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
 
   async function stopPreview(showStatus) {
     const audio = element('#preview-audio')
+    const playButton = element('#preview-play')
     audio.pause()
     audio.removeAttribute('src')
     audio.load()
+    playButton.hidden = true
+    playButton.disabled = false
     await releasePreviewSession()
     element('#preview-player').hidden = true
     if (showStatus) setStatus('试听已停止。')
+  }
+
+  async function playPreview(allowGestureFallback = false) {
+    const preview = state.preview
+    if (!preview) return false
+    const playButton = element('#preview-play')
+    playButton.disabled = true
+    try {
+      await element('#preview-audio').play()
+      playButton.hidden = true
+      setStatus(`正在试听《${preview.track.title}》`)
+      return true
+    } catch (error) {
+      playButton.hidden = false
+      if (allowGestureFallback) {
+        setStatus(`音源已就绪，请点击播放试听《${preview.track.title}》。`)
+      } else {
+        setStatus(`试听播放失败：${error.message || String(error)}`, true)
+      }
+      return false
+    } finally {
+      playButton.disabled = false
+    }
+  }
+
+  function showPreviewPlayPrompt(track) {
+    element('#preview-play').hidden = false
+    setStatus(`音源已就绪，请点击播放试听《${track.title}》。`)
+  }
+
+  function requiresExplicitPreviewGesture() {
+    const userAgent = documentRef.defaultView?.navigator?.userAgent || ''
+    return /Android|iPhone|iPad|iPod/i.test(userAgent)
   }
 
   async function releasePreviewSession() {

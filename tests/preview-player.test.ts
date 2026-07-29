@@ -116,6 +116,75 @@ describe('preview mini player', () => {
     expect((window.document.querySelector('#preview-player') as any).hidden).toBe(true)
   })
 
+  it('waits for an explicit Android user gesture after resolving audio', async () => {
+    const window = createWindow('Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 SongloftWebView')
+    const audio = window.document.querySelector('#preview-audio') as any
+    audio.play = vi.fn(async () => undefined)
+    audio.pause = vi.fn()
+    audio.load = vi.fn()
+
+    const pluginApi = createAPI(async (_path: string, body: any) => searchResponse(body.keyword))
+    const request = vi.fn(async () => jsonResponse({
+      token: 'token-android',
+      stream_url: '/api/v1/plugin-previews/token-android',
+      audio: { format: 'mp3', bitrate: 320, quality: 320 },
+    }, 201))
+    const app = createSearchApp(window.document, pluginApi, request as any)
+    await app.init()
+    await search(window, '夜曲')
+
+    ;(window.document.querySelector('[data-preview-id]') as any).click()
+    await flushTasks()
+
+    const playButton = window.document.querySelector('#preview-play') as any
+    expect(audio.play).not.toHaveBeenCalled()
+    expect(playButton.hidden).toBe(false)
+    expect(window.document.querySelector('#status')?.textContent).toContain('点击播放')
+
+    playButton.click()
+    await flushTasks()
+
+    expect(audio.play).toHaveBeenCalledTimes(1)
+    expect(playButton.hidden).toBe(true)
+    expect(window.document.querySelector('#status')?.textContent).toContain('正在试听')
+  })
+
+  it('falls back to an explicit play button when desktop autoplay is blocked', async () => {
+    const window = createWindow()
+    const audio = window.document.querySelector('#preview-audio') as any
+    audio.play = vi.fn()
+      .mockRejectedValueOnce(new Error('NotAllowedError'))
+      .mockResolvedValueOnce(undefined)
+    audio.pause = vi.fn()
+    audio.load = vi.fn()
+
+    const pluginApi = createAPI(async (_path: string, body: any) => searchResponse(body.keyword))
+    const request = vi.fn(async () => jsonResponse({
+      token: 'token-desktop',
+      stream_url: '/api/v1/plugin-previews/token-desktop',
+      audio: { format: 'mp3', bitrate: 320, quality: 320 },
+    }, 201))
+    const app = createSearchApp(window.document, pluginApi, request as any)
+    await app.init()
+    await search(window, '夜曲')
+
+    ;(window.document.querySelector('[data-preview-id]') as any).click()
+    await flushTasks()
+
+    const playButton = window.document.querySelector('#preview-play') as any
+    expect(audio.play).toHaveBeenCalledTimes(1)
+    expect(playButton.hidden).toBe(false)
+    expect(window.document.querySelector('#status')?.textContent).toContain('点击播放')
+    expect(request).not.toHaveBeenCalledWith('/api/v1/plugin-previews/token-desktop', expect.anything())
+
+    playButton.click()
+    await flushTasks()
+
+    expect(audio.play).toHaveBeenCalledTimes(2)
+    expect(playButton.hidden).toBe(true)
+    expect(window.document.querySelector('#status')?.textContent).toContain('正在试听')
+  })
+
   it('shows a clear resolution error', async () => {
     const window = createWindow()
     const audio = window.document.querySelector('#preview-audio') as any
@@ -134,11 +203,14 @@ describe('preview mini player', () => {
   })
 })
 
-function createWindow() {
+function createWindow(userAgent?: string) {
   const window = new Window({
     url: 'https://songloft.test/api/v1/jsplugin/gdstudio/',
     settings: { disableCSSFileLoading: true, disableJavaScriptFileLoading: true },
   })
+  if (userAgent) {
+    Object.defineProperty(window.navigator, 'userAgent', { value: userAgent })
+  }
   window.document.write(html)
   return window
 }

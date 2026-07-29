@@ -15,6 +15,7 @@ Repository: <https://github.com/jwxa/songloft-plugin-gdstudio>
 - All automated tests use a controlled mock transport and never depend on the public GDStudio service.
 - Supports full streaming preview in the plugin page, followed by explicit library import or download under Songloft `music_path`; downloads preserve the upstream format without transcoding.
 - Shows immediate loading feedback while resolving previews. Lossless formats are labeled as “FLAC/APE · Lossless” instead of presenting upstream nominal values such as `2000` as an exact constant bitrate.
+- Android/iOS WebViews show a “Play preview” button after resolution so playback starts from a second explicit user gesture. Desktop autoplay falls back to the same button when blocked by platform policy.
 - After “Play in main player” starts the persisted song queue, supported Songloft clients open the full-screen player through the host navigation bridge.
 - Downloads are submitted as Songloft background tasks. The page polls and displays queued, preparing, real byte-transfer, finalizing, completed, and failed states without blocking a QuickJS request for the full file.
 - Selected tracks can be added to a FIFO batch queue. Page concurrency is configurable from one to three, defaults to two, and is additionally protected by a host-global limit.
