@@ -1,0 +1,19 @@
+Songloft GDStudio Plugin
+
+Quality fallback and data mapping are independently implemented with reference to musicdl 2.13.4:
+https://github.com/CharlesPikachu/musicdl
+
+Runtime network requests use the GD Studio public API documented at
+https://music-api.gdstudio.xyz/api.php. GD Studio requests attribution to
+"GD音乐台 (music.gdstudio.xyz)" and limits use to noncommercial purposes.
+
+When GD Studio returns no playable URL for a Kuwo result, the plugin may use
+the same-source Kuwo resolver approach adopted by musicsquare while preserving
+the original Kuwo song ID and source:
+https://github.com/CharlesPikachu/musicsquare
+
+musicdl copyright notice:
+Copyright (c) 2018–2026 CharlesPikachu
+
+This plugin is intended only for personal or small private noncommercial use.
+It does not bundle or execute musicdl or any Python runtime.

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDStudio 音乐</title>
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+  <section id="consent-dialog" class="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-dialog-title">
+    <div class="consent-dialog-backdrop"></div>
+    <div class="consent-dialog-card">
+      <p class="eyebrow">使用前请确认</p>
+      <h2 id="consent-dialog-title">个人研究使用须知</h2>
+      <div class="consent-copy">
+        <p>本插件仅供个人学习与研究，禁止分享、传播、公开部署或商业使用。</p>
+        <p>请仅访问、试听和保存你已获合法授权的内容，并在研究完成后及时清理。使用者应自行遵守所在地法律、上游服务规则及各音乐来源条款。</p>
+        <p>继续使用表示你已理解上述限制，并同意自行承担使用与合规责任。</p>
+      </div>
+      <label class="consent-check"><input id="consent-checkbox" type="checkbox"> 我已阅读并同意上述使用须知</label>
+      <button id="consent-accept" class="primary-button" type="button" disabled>同意并进入</button>
+    </div>
+  </section>
+
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Songloft 插件</p>
+      <h1>GDStudio 音乐</h1>
+      <p class="subtitle">先搜索和比较不同来源，满意后再手动加入曲库。</p>
+    </div>
+    <span class="notice-badge" title="仅供个人学习与研究；禁止分享、传播或商业使用；仅处理你已获合法授权的内容">仅供个人研究 · 禁止传播</span>
+  </header>
+
+  <main class="page-shell">
+    <section class="search-card" aria-labelledby="search-title">
+      <h2 id="search-title">搜索歌曲</h2>
+      <form id="search-form" class="search-form">
+        <label class="search-field">
+          <span class="sr-only">歌曲、歌手或专辑</span>
+          <input id="keyword" name="keyword" type="search" autocomplete="off" placeholder="输入歌曲、歌手或专辑" required>
+        </label>
+        <button id="search-button" class="primary-button" type="submit">搜索</button>
+      </form>
+
+      <div id="source-filters" class="source-filters" aria-label="搜索来源">
+        <button class="filter-chip active" type="button" data-source="all">全部</button>
+        <button class="filter-chip" type="button" data-source="netease">网易云</button>
+        <button class="filter-chip" type="button" data-source="kuwo">酷我</button>
+        <button class="filter-chip" type="button" data-source="tencent">腾讯</button>
+      </div>
+    </section>
+
+    <details class="settings-card">
+      <summary>来源设置</summary>
+      <p>停用的来源不会参与“全部”搜索，设置会保存在当前插件中。</p>
+      <div class="source-settings">
+        <label><input type="checkbox" data-setting-source="netease"> 网易云</label>
+        <label><input type="checkbox" data-setting-source="kuwo"> 酷我</label>
+        <label><input type="checkbox" data-setting-source="tencent"> 腾讯</label>
+      </div>
+      <p class="source-unavailable-note">腾讯来源使用 musicdl QQMusicClient 已收录的同源解析接口；失败时不会自动替换为其他音乐来源。</p>
+      <label class="download-template-field">下载路径模板
+        <input id="download-template" type="text" value="downloads/{artist}-{album}/{title}" aria-describedby="download-template-help">
+      </label>
+      <p id="download-template-help">仅填写相对路径模板，根目录始终使用 Songloft music_path。</p>
+      <label class="download-concurrency-field">最大并发下载数
+        <select id="download-concurrency">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+        </select>
+      </label>
+      <p>批量下载按选择顺序排队；建议私有部署保持 2，避免同时占满上游和磁盘。</p>
+      <button id="save-download-settings" class="secondary-button" type="button">保存下载设置</button>
+    </details>
+
+    <div id="status" class="status" role="status" aria-live="polite">请输入关键词开始搜索。</div>
+    <section class="batch-toolbar" aria-label="批量入库">
+      <span>已选择 <strong id="selection-count">0</strong> 首</span>
+      <button id="batch-add" class="primary-button" type="button" disabled>批量添加到曲库</button>
+      <button id="batch-download" class="secondary-button" type="button" disabled>批量下载</button>
+      <button id="batch-retry" class="secondary-button" type="button" hidden>仅重试失败项</button>
+    </section>
+    <section id="download-queue" class="download-queue" aria-labelledby="download-queue-title" hidden>
+      <div class="download-queue-header">
+        <div>
+          <p class="eyebrow">后台下载</p>
+          <h2 id="download-queue-title">下载队列</h2>
+        </div>
+        <span id="download-queue-summary" class="group-summary"></span>
+      </div>
+      <div id="download-jobs" class="download-jobs"></div>
+    </section>
+    <section id="results" class="results" aria-label="搜索结果"></section>
+
+    <section id="preview-player" class="preview-player" aria-label="试听播放器" hidden>
+      <div class="preview-copy">
+        <span class="eyebrow">正在试听</span>
+        <strong id="preview-title">-</strong>
+        <span id="preview-meta" class="track-meta"></span>
+      </div>
+      <audio id="preview-audio" controls preload="metadata"></audio>
+      <button id="preview-stop" class="secondary-button" type="button">停止试听</button>
+    </section>
+
+    <section id="error-dialog" class="error-dialog" role="dialog" aria-modal="true" aria-labelledby="error-dialog-title" hidden>
+      <div class="error-dialog-backdrop" data-error-close></div>
+      <div class="error-dialog-card">
+        <div class="error-dialog-header">
+          <h2 id="error-dialog-title">查询失败详情</h2>
+          <button class="icon-button" type="button" data-error-close aria-label="关闭错误详情">×</button>
+        </div>
+        <p>以下信息可用于排查服务端网络或上游接口问题。</p>
+        <pre id="error-detail"></pre>
+        <button class="secondary-button" type="button" data-error-close>关闭</button>
+      </div>
+    </section>
+
+    <footer class="license-card">
+      <strong>来源与使用说明</strong>
+      <p id="plugin-info">插件版本加载中…</p>
+      <p>运行时直接使用上游公开接口，音质降级与数据映射参考 musicdl 2.13.4；自动化测试使用模拟服务。仅供个人学习与研究，禁止分享、传播或商业使用；请确保访问和保存的内容已获合法授权，研究完成后及时清理。</p>
+      <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener">查看 PolyForm Noncommercial License 1.0.0 官方文本</a>
+    </footer>
+  </main>
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>

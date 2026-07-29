@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/songloft-org/plugin-toolchain/main/schemas/plugin.schema.json",
+  "name": "GDStudio 音乐",
+  "version": "0.2.6",
+  "description": "搜索 GDStudio 音乐，试听满意后手动加入 Songloft 曲库",
+  "author": "jwxa",
+  "homepage": "https://github.com/jwxa/songloft-plugin-gdstudio",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "icon": "icon.svg",
+  "entryPath": "gdstudio",
+  "main": "main.js",
+  "minHostVersion": "2.11.0",
+  "permissions": [
+    "storage",
+    "songs.write"
+  ],
+  "updateUrl": "https://raw.githubusercontent.com/jwxa/songloft-plugin-gdstudio/main/plugin.json",
+  "download_url": "",
+  "entryHash": "",
+  "zipHash": ""
+}

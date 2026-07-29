@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GDStudio 音乐">
+  <defs>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6750a4"/>
+      <stop offset="1" stop-color="#9c4146"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#g)"/>
+  <path fill="#fff" d="M40 14v27.2A9 9 0 1 1 36 34V21l-14 3v20.2A9 9 0 1 1 18 37V20l22-6Z"/>
+</svg>

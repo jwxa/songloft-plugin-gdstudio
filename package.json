@@ -1,0 +1,28 @@
+{
+  "name": "songloft-plugin-gdstudio",
+  "version": "0.2.6",
+  "description": "在 Songloft 中搜索、试听并手动入库 GDStudio 音乐",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jwxa/songloft-plugin-gdstudio.git"
+  },
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "validate": "tsc --noEmit && node scripts/build.mjs && node scripts/validate-build.mjs",
+    "test": "vitest run",
+    "test:mock-search": "vitest run tests/mock-search.test.ts",
+    "test:ui": "vitest run tests/ui.test.ts"
+  },
+  "devDependencies": {
+    "@songloft/plugin-builder": "^2.13.0",
+    "@songloft/plugin-sdk": "^2.13.0",
+    "happy-dom": "^18.0.1",
+    "jszip": "^3.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
