@@ -1,0 +1,6 @@
+{
+  "name": "jwxa Songloft 插件源",
+  "plugins": [
+    "https://raw.githubusercontent.com/jwxa/songloft-plugin-gdstudio/main/plugin.json"
+  ]
+}

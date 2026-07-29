@@ -1,6 +1,6 @@
 {
   "name": "songloft-plugin-gdstudio",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "在 Songloft 中搜索、试听并手动入库 GDStudio 音乐",
   "private": true,
   "repository": {

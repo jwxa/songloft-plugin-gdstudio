@@ -31,9 +31,19 @@ corepack pnpm test
 
 The build artifact is written to `dist/gdstudio.jsplugin.zip`.
 
-## Private Installation
+## Plugin Store Installation
 
-1. Run `corepack pnpm run validate` to build and validate the package.
+Add the following URL under Songloft **Plugin Store → Manage Registries**:
+
+```text
+https://raw.githubusercontent.com/jwxa/songloft-plugin-gdstudio/main/registry.json
+```
+
+Return to the plugin store, search for “GDStudio Music,” and install it. The plugin is also being submitted to the official Songloft registry; once accepted, adding this registry manually is no longer necessary.
+
+## Manual Installation
+
+1. Download `gdstudio.jsplugin.zip` from GitHub Releases, or run `corepack pnpm run validate` to build and validate it locally.
 2. Sign in to Songloft and open JS plugin management.
 3. Upload `dist/gdstudio.jsplugin.zip`; an existing matching `entryPath` is replaced as an update.
 4. Refresh the plugin page and verify the version, search, preview, and download states.

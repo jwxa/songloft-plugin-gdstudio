@@ -31,9 +31,19 @@ corepack pnpm test
 
 构建产物位于 `dist/gdstudio.jsplugin.zip`。
 
-## 私有安装
+## 插件商店安装
 
-1. 执行 `corepack pnpm run validate` 生成并校验插件包。
+在 Songloft「插件商店 → 管理订阅源」中添加：
+
+```text
+https://raw.githubusercontent.com/jwxa/songloft-plugin-gdstudio/main/registry.json
+```
+
+返回插件商店后即可搜索“GDStudio 音乐”并一键安装。插件也已申请加入 Songloft 官方插件源；官方收录后无需再手动添加上述订阅源。
+
+## 手动安装
+
+1. 从 GitHub Releases 下载 `gdstudio.jsplugin.zip`，或执行 `corepack pnpm run validate` 自行生成并校验插件包。
 2. 登录 Songloft 管理端，打开 JS 插件管理页面。
 3. 上传 `dist/gdstudio.jsplugin.zip`；同一 `entryPath` 会作为覆盖更新处理。
 4. 刷新插件页面，确认版本、搜索、试听和下载状态正常。

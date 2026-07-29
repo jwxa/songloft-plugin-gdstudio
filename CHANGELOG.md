@@ -2,6 +2,13 @@
 
 本文件记录 Songloft GDStudio 插件的重要版本变化。日期采用 `YYYY-MM-DD`。
 
+## [0.2.8] - 2026-07-29
+
+### Added
+
+- 提供可直接添加到 Songloft 插件商店的 `registry.json` 个人订阅源。
+- 在公开 `plugin.json` 中提供 GitHub Release 下载地址，使插件支持从注册源一键安装和更新。
+
 ## [0.2.7] - 2026-07-29
 
 ### Fixed
