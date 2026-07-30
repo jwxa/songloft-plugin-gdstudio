@@ -91,11 +91,16 @@ export interface SongLibrary {
 }
 
 export interface DownloadOutcome {
-  status: 'queued' | 'already_downloaded' | 'failed'
+  status: 'queued' | 'completed' | 'already_downloaded' | 'failed'
   song: LibrarySong
   metadata?: MetadataEnrichment
   task?: DownloadTask
   detail?: string
+}
+
+export interface HostCapabilities {
+  download_mode: 'background' | 'legacy' | 'unavailable'
+  download_progress: boolean
 }
 
 export interface DownloadTask {

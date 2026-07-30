@@ -48,7 +48,7 @@ Return to the plugin store, search for “GDStudio Music,” and install it. The
 3. Upload `dist/gdstudio.jsplugin.zip`; an existing matching `entryPath` is replaced as an update.
 4. Refresh the plugin page and verify the version, search, preview, and download states.
 
-Songloft `2.11.0` or later is required. See `SPEC.en.md` for requirements and boundaries, `CHANGELOG.md` for release changes, and `AGENTS.en.md` for contributor guidance.
+Songloft `2.11.0` or later is required. Official `2.11.0` supports search, library import, and compatibility downloads. The plugin hides preview controls when the temporary preview API is unavailable, falls back to synchronous downloads without live byte progress when background download tasks are unavailable, and asks users to return to the main player manually when the client navigation bridge is missing. `jwxa/songloft` builds containing the host extensions provide the complete feature set. See `SPEC.en.md` for requirements and boundaries, `CHANGELOG.md` for release changes, and `AGENTS.en.md` for contributor guidance.
 
 ## Known Limitations
 

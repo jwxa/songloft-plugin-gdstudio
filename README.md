@@ -48,7 +48,7 @@ https://raw.githubusercontent.com/jwxa/songloft-plugin-gdstudio/main/registry.js
 3. 上传 `dist/gdstudio.jsplugin.zip`；同一 `entryPath` 会作为覆盖更新处理。
 4. 刷新插件页面，确认版本、搜索、试听和下载状态正常。
 
-插件要求 Songloft `2.11.0` 或更高版本。完整需求与边界见 `SPEC.md`，版本变化见 `CHANGELOG.md`，开发约定见 `AGENTS.md`。
+插件要求 Songloft `2.11.0` 或更高版本。官方 `2.11.0` 可使用搜索、入库和兼容下载；缺少临时试听接口时插件会隐藏试听按钮，缺少后台下载任务接口时会回退到同步下载且不显示实时字节进度，缺少客户端导航桥接时需手动返回主播放器。包含对应宿主扩展的 `jwxa/songloft` 可使用全部功能。完整需求与边界见 `SPEC.md`，版本变化见 `CHANGELOG.md`，开发约定见 `AGENTS.md`。
 
 ## 已知限制
 

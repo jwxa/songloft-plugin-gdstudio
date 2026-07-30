@@ -468,7 +468,7 @@ function durationValue(extraData: unknown): number {
 }
 
 export const GDSTUDIO_CLIENT_INFO = {
-  plugin_version: '0.2.6',
+  plugin_version: '0.2.9',
   musicdl_version: '2.13.4',
   protocol_version: `public-api-${GDSTUDIO_API_VERSION}`,
 }

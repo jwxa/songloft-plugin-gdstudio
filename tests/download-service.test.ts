@@ -44,4 +44,14 @@ describe('DownloadService', () => {
     const result = await new DownloadService(new LibraryService(songs, metadata), songs).status('task-1')
     expect(result).toMatchObject({ id: 'task-1', status: 'completed', downloaded_bytes: 100, total_bytes: 100 })
   })
+
+  it('falls back to the legacy synchronous download bridge', async () => {
+    const songs = new FakeSongs()
+    ;(songs as any).downloadStart = undefined
+    ;(songs as any).downloadStatus = undefined
+    const result = await new DownloadService(new LibraryService(songs, metadata), songs).download(track)
+    expect(result.status).toBe('completed')
+    expect(result.task).toMatchObject({ status: 'completed', phase: 'completed', path: 'downloads/file.mp3' })
+    expect(songs.options).toEqual({ id: 7, path_template: 'downloads/{artist}-{album}/{title}', embed_metadata: true })
+  })
 })

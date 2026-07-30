@@ -20,6 +20,7 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
     downloadJobs: [],
     activeDownloads: 0,
     maxDownloadConcurrency: 2,
+    capabilities: { preview: true, downloadMode: 'background', downloadProgress: true },
   }
 
   const element = selector => documentRef.querySelector(selector)
@@ -29,6 +30,7 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
     documentRef.body.classList.add('consent-open')
     await loadSettings()
     renderFilters()
+    renderCapabilities()
   }
 
   function bindEvents() {
@@ -103,7 +105,24 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
     element('#download-concurrency').value = String(state.maxDownloadConcurrency)
     const info = await pluginApi.apiGet('/api/info').catch(() => null)
     if (info) element('#plugin-info').textContent = `插件 ${info.plugin_version} · musicdl ${info.musicdl_version} · GDStudio 协议 ${info.protocol_version}`
+    const capabilities = await pluginApi.apiGet('/api/capabilities').catch(() => null)
+    if (capabilities?.download_mode) {
+      state.capabilities.downloadMode = capabilities.download_mode
+      state.capabilities.downloadProgress = !!capabilities.download_progress
+    }
     renderSettings()
+  }
+
+  function renderCapabilities() {
+    const messages = []
+    if (!state.capabilities.preview) messages.push('当前 Songloft 不支持插件内试听，请先添加到曲库后手动返回主播放器播放。')
+    if (state.capabilities.downloadMode === 'legacy') messages.push('当前 Songloft 使用兼容下载模式，下载期间不显示实时字节进度。')
+    if (state.capabilities.downloadMode === 'unavailable') messages.push('当前 Songloft 不支持插件下载，下载按钮已隐藏。')
+    const notice = element('#compatibility-notice')
+    notice.textContent = messages.join(' ')
+    notice.hidden = messages.length === 0
+    element('#batch-download').hidden = state.capabilities.downloadMode === 'unavailable'
+    element('#save-download-settings').hidden = state.capabilities.downloadMode === 'unavailable'
   }
 
   async function saveDownloadSettings() {
@@ -273,9 +292,9 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
         </div>
         <div class="track-actions">
           <span class="track-duration">${formatDuration(track.duration)}</span>
-          <button class="secondary-button${isPreviewLoading ? ' is-loading' : ''}" type="button" data-preview-source="${track.source}" data-preview-id="${escapeHTML(track.id)}" ${isPreviewLoading ? 'disabled aria-busy="true"' : 'aria-busy="false"'}>${isPreviewLoading ? '解析中…' : '试听'}</button>
+          ${state.capabilities.preview ? `<button class="secondary-button${isPreviewLoading ? ' is-loading' : ''}" type="button" data-preview-source="${track.source}" data-preview-id="${escapeHTML(track.id)}" ${isPreviewLoading ? 'disabled aria-busy="true"' : 'aria-busy="false"'}>${isPreviewLoading ? '解析中…' : '试听'}</button>` : ''}
           <button class="primary-button library-button" type="button" data-library-source="${track.source}" data-library-id="${escapeHTML(track.id)}" ${isAdding ? 'disabled' : ''}>${isAdding ? '正在入库…' : librarySong ? '主播放器播放' : '添加到曲库'}</button>
-          <button class="secondary-button download-button" type="button" data-download-source="${track.source}" data-download-id="${escapeHTML(track.id)}" ${state.downloading.has(track.dedupe_key) ? 'disabled' : ''}>${state.downloading.has(track.dedupe_key) ? '正在下载…' : state.downloaded.has(track.dedupe_key) ? '已下载' : '下载到本地'}</button>
+          ${state.capabilities.downloadMode !== 'unavailable' ? `<button class="secondary-button download-button" type="button" data-download-source="${track.source}" data-download-id="${escapeHTML(track.id)}" ${state.downloading.has(track.dedupe_key) ? 'disabled' : ''}>${state.downloading.has(track.dedupe_key) ? '正在下载…' : state.downloaded.has(track.dedupe_key) ? '已下载' : '下载到本地'}</button>` : ''}
         </div>
       </div>
     `
@@ -519,7 +538,14 @@ export function createSearchApp(documentRef, pluginApi, request = globalThis.fet
     } catch (error) {
       await releasePreviewSession()
       element('#preview-player').hidden = true
-      setStatus(`无法开始试听：${error.message || String(error)}`, true)
+      const detail = error.message || String(error)
+      if (detail.includes('HTTP 404') || detail.includes('404 page not found')) {
+        state.capabilities.preview = false
+        renderCapabilities()
+        setStatus('当前 Songloft 不支持插件内试听，请添加到曲库后播放。', true)
+      } else {
+        setStatus(`无法开始试听：${detail}`, true)
+      }
     } finally {
       if (state.previewLoadingKey === track.dedupe_key) state.previewLoadingKey = ''
       renderResults()

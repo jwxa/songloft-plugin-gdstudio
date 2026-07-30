@@ -201,6 +201,25 @@ describe('preview mini player', () => {
     await flushTasks()
     expect(window.document.querySelector('#status')?.textContent).toContain(SOURCE_UNAVAILABLE_MESSAGE)
   })
+
+  it('hides preview controls when the host preview API is unavailable', async () => {
+    const window = createWindow()
+    const audio = window.document.querySelector('#preview-audio') as any
+    audio.pause = vi.fn()
+    audio.load = vi.fn()
+    const pluginApi = createAPI(async (_path: string, body: any) => searchResponse(body.keyword))
+    const request = vi.fn(async () => jsonResponse(null, 404))
+    const app = createSearchApp(window.document, pluginApi, request as any)
+    await app.init()
+    await search(window, '夜曲')
+
+    ;(window.document.querySelector('[data-preview-id]') as any).click()
+    await flushTasks()
+
+    expect(window.document.querySelector('[data-preview-id]')).toBeNull()
+    expect(window.document.querySelector('#compatibility-notice')?.textContent).toContain('不支持插件内试听')
+    expect(window.document.querySelector('#status')?.textContent).toContain('添加到曲库后播放')
+  })
 })
 
 function createWindow(userAgent?: string) {

@@ -13,9 +13,30 @@ export class DownloadService {
     if (added.song.type === 'local') {
       return { status: 'already_downloaded', song: added.song, metadata: added.metadata }
     }
-    if (typeof this.songs.downloadStart !== 'function') throw new Error('当前 Songloft 不支持后台下载任务')
-    const task = await this.songs.downloadStart(added.song.id, { path_template: validTemplate, embed_metadata: true })
-    return { status: 'queued', song: added.song, metadata: added.metadata, task }
+    const options = { path_template: validTemplate, embed_metadata: true }
+    if (typeof this.songs.downloadStart === 'function' && typeof this.songs.downloadStatus === 'function') {
+      const task = await this.songs.downloadStart(added.song.id, options)
+      return { status: 'queued', song: added.song, metadata: added.metadata, task }
+    }
+    if (typeof this.songs.download !== 'function') throw new Error('当前 Songloft 不支持下载到本地')
+    const result = await this.songs.download(added.song.id, options)
+    if (result.error || result.status === 'failed') {
+      return { status: 'failed', song: added.song, metadata: added.metadata, detail: result.error || '下载失败' }
+    }
+    return {
+      status: 'completed',
+      song: { ...added.song, type: 'local' },
+      metadata: added.metadata,
+      task: {
+        id: `legacy-${added.song.id}`,
+        song_id: added.song.id,
+        status: 'completed',
+        phase: 'completed',
+        downloaded_bytes: 0,
+        total_bytes: 0,
+        path: result.path,
+      },
+    }
   }
 
   async status(taskID: string): Promise<DownloadTask> {

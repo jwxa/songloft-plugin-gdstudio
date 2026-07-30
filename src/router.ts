@@ -6,7 +6,7 @@ import { DownloadService } from './download-service'
 import { SearchInputError, SearchService } from './search-service'
 import { DEFAULT_DOWNLOAD_CONCURRENCY, DEFAULT_DOWNLOAD_TEMPLATE, SettingsService, validateDownloadConcurrency, validatePathTemplate } from './settings'
 import { GDSTUDIO_CLIENT_INFO, SOURCE_UNAVAILABLE_MESSAGE } from './gdstudio-client'
-import type { GDStudioAudioResolver, GDStudioClient, GDStudioMetadataEnricher, GDStudioSourceData, PluginStorage, SearchRequest, SearchTrack, SongLibrary } from './types'
+import type { GDStudioAudioResolver, GDStudioClient, GDStudioMetadataEnricher, GDStudioSourceData, HostCapabilities, PluginStorage, SearchRequest, SearchTrack, SongLibrary } from './types'
 
 export interface PluginDependencies {
   storage: PluginStorage
@@ -27,6 +27,20 @@ export function createPluginRouter(dependencies: PluginDependencies): Router {
   })
 
   router.get('/api/info', async () => jsonResponse(GDSTUDIO_CLIENT_INFO))
+
+  router.get('/api/capabilities', async () => {
+    const capabilities: HostCapabilities = {
+      download_mode: dependencies.songs
+        ? typeof dependencies.songs.downloadStart === 'function' && typeof dependencies.songs.downloadStatus === 'function'
+          ? 'background'
+          : typeof dependencies.songs.download === 'function'
+            ? 'legacy'
+            : 'unavailable'
+        : 'unavailable',
+      download_progress: !!dependencies.songs && typeof dependencies.songs.downloadStart === 'function' && typeof dependencies.songs.downloadStatus === 'function',
+    }
+    return jsonResponse(capabilities)
+  })
 
   router.put('/api/settings', async request => {
     try {
